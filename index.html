@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f7f8">
-  <title>問診票の整理・登録 | Dental Flow</title>
+  <title>歯科事務アシストデモ | Dental Flow</title>
   <style>
     :root {
       color-scheme: light;
@@ -162,6 +162,28 @@
     .slot.booked { border-color: #b9dfd2; background: #f3faf7; }
     .slot.empty { display: block; color: var(--muted); font-size: 9px; line-height: 1.7; }
     .match-help { margin-top: 11px; color: var(--muted); font-size: 8px; line-height: 1.7; }
+    .audit-controls { display: grid; grid-template-columns: minmax(220px, 1fr) auto auto; gap: 10px; align-items: end; }
+    .control-group { min-width: 0; }
+    .control-group label { display: block; margin-bottom: 5px; color: #536870; font-size: 9px; font-weight: 700; }
+    .audit-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+    .audit-stat { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 11px; }
+    .audit-stat-label { color: var(--muted); font-size: 8px; }
+    .audit-stat-value { margin-top: 5px; font-size: 18px; font-weight: 750; }
+    .audit-list { display: grid; gap: 9px; }
+    .audit-row { display: grid; grid-template-columns: minmax(120px, .7fr) minmax(120px, 1fr) minmax(125px, 1fr) minmax(125px, 1fr) minmax(120px, .8fr) auto; gap: 9px; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 10px; }
+    .audit-row.issue { border-color: #efd9b2; background: #fffaf2; }
+    .audit-row.reviewed { border-color: #b9dfd2; background: #f5faf8; }
+    .audit-cell-label { display: none; color: var(--muted); font-size: 8px; }
+    .audit-cell { min-width: 0; font-size: 9px; line-height: 1.6; overflow-wrap: anywhere; }
+    .audit-cell.strong { font-weight: 700; }
+    .audit-cell.muted { color: var(--muted); }
+    .audit-status { display: inline-block; border-radius: 20px; background: #edf3f5; color: #607982; padding: 4px 7px; font-size: 8px; white-space: nowrap; }
+    .audit-status.issue { background: #fff0ef; color: var(--red); }
+    .audit-status.reviewed { background: #e8f5f1; color: var(--teal); }
+    .audit-row select { min-width: 0; }
+    .audit-summary { margin: 13px 0 0; padding: 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: #f9fbfc; font-size: 9px; line-height: 1.7; }
+    .audit-summary.ready { border-color: #b9dfd2; color: #276b60; background: #f3faf7; }
+    .audit-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
     .footnote { margin-top: 15px; color: #819096; font-size: 9px; line-height: 1.75; }
     .toast {
       position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 12px); opacity: 0;
@@ -194,6 +216,13 @@
       .slot-reason { grid-column: 1 / -1; grid-row: 2; }
       .slot-actions { grid-column: 1 / -1; justify-content: flex-start; }
       .slot-actions .button { flex: 1; }
+      .audit-controls { grid-template-columns: 1fr; }
+      .audit-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .audit-row { grid-template-columns: 1fr 1fr; gap: 7px 10px; }
+      .audit-cell-label { display: block; margin-bottom: 2px; }
+      .audit-row .audit-review-control { grid-column: 1 / -1; }
+      .audit-actions { align-items: flex-start; flex-direction: column; }
+      .audit-actions .action-buttons { width: 100%; }
     }
   </style>
 </head>
@@ -209,16 +238,17 @@
   <main class="page">
     <section class="page-head">
       <div>
-        <div class="eyebrow">STEP-BY-STEP WORKFLOW · QUESTIONNAIRE → REVIEW → REGISTRATION</div>
-        <h1>問診票の整理・確認・登録</h1>
-        <p class="intro">問診内容を読み取り、要確認項目をチェック。スタッフの承認後、院内ソフトへの登録をデモで確認できます。</p>
+        <div class="eyebrow">DENTAL OFFICE ADMINISTRATION · INTERACTIVE DEMO</div>
+        <h1>歯科事務アシスト</h1>
+        <p class="intro">問診票の整理・登録、キャンセル枠の照合、カルテと請求の確認をサンプルデータで体験できます。</p>
       </div>
-      <div class="step-badge">✦　問診票 1件ずつ処理</div>
+      <div class="step-badge">✦　3つの事務フロー</div>
     </section>
 
     <nav class="module-tabs" aria-label="デモ機能">
       <button type="button" class="module-tab active" id="intake-tab" aria-selected="true">① 問診票の整理・登録</button>
       <button type="button" class="module-tab" id="waitlist-tab" aria-selected="false">② キャンセル枠の照合</button>
+      <button type="button" class="module-tab" id="audit-tab" aria-selected="false">③ カルテ・請求の照合</button>
     </nav>
 
     <section class="module-view" id="intake-view">
@@ -339,6 +369,55 @@
         </section>
       </section>
       <p class="footnote">提案書の「キャンセル時に台帳を確認」する手順を、予約希望の曜日・時間帯と空き枠の照合、候補案内、了承・予約状況の確認まで試せる画面にしています。すべて架空データを使ったデモです。</p>
+    </section>
+
+    <section class="module-view" id="audit-view" hidden>
+      <div class="notice" role="note">
+        <span aria-hidden="true">⚠</span>
+        <div><strong>架空の診療・請求データを照合するデモです。</strong> 実際のカルテやレセプトには接続せず、請求の妥当性・保険適用・診療上の正しさは判定しません。差異の確認と、CSVの手動ダウンロードだけをこのブラウザー内で行います。</div>
+      </div>
+      <section class="card" aria-labelledby="audit-heading">
+        <div class="card-head">
+          <div><h2 class="card-title" id="audit-heading">カルテ・請求データの照合</h2><div class="card-caption">診療日・項目コード・金額を記録同士で比較し、確認が必要な行を抽出</div></div>
+          <span class="ai-mark">ルール照合デモ</span>
+        </div>
+        <div class="form">
+          <div class="audit-controls">
+            <div class="control-group">
+              <label for="audit-sample">照合サンプル</label>
+              <select id="audit-sample">
+                <option value="mixed">混在ケース：一致・差額・記録不足</option>
+                <option value="matched">一致ケース：すべて同額</option>
+                <option value="missing">記録不足ケース：カルテ項目なし</option>
+              </select>
+            </div>
+            <button class="button primary" type="button" id="run-audit-button">カルテと請求を照合</button>
+            <button class="button" type="button" id="reset-audit-button">初期状態に戻す</button>
+          </div>
+          <div class="empty-state" id="audit-empty" style="margin-top:14px"><strong>照合結果はまだありません</strong>ケースを選んで「カルテと請求を照合」を押すと、架空データの比較結果が表示されます。</div>
+          <div id="audit-results" hidden>
+            <div class="audit-stats" aria-label="照合集計">
+              <article class="audit-stat"><div class="audit-stat-label">対象行</div><div class="audit-stat-value" id="audit-total">0</div></article>
+              <article class="audit-stat"><div class="audit-stat-label">一致</div><div class="audit-stat-value" id="audit-matched">0</div></article>
+              <article class="audit-stat"><div class="audit-stat-label">要確認</div><div class="audit-stat-value" id="audit-issues">0</div></article>
+              <article class="audit-stat"><div class="audit-stat-label">未確認の要確認行</div><div class="audit-stat-value" id="audit-pending">0</div></article>
+            </div>
+            <div class="audit-row" style="border:0;background:transparent;padding:4px 10px;color:var(--muted);font-size:8px;font-weight:700" aria-hidden="true">
+            <div>患者</div><div>カルテの診療日・内容</div><div>請求の診療日・内容</div><div>記録の比較</div><div>照合結果</div><div>確認状況</div>
+            </div>
+            <div class="audit-list" id="audit-list" aria-live="polite"></div>
+            <div class="audit-summary" id="audit-summary" aria-live="polite"></div>
+            <div class="audit-actions">
+              <span class="source-status" id="audit-action-hint">差異のある行を確認してください。</span>
+              <div class="action-buttons">
+                <button class="button" type="button" id="download-audit-button">CSVをダウンロード</button>
+                <button class="button primary" type="button" id="complete-audit-button" disabled>確認を完了</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <p class="footnote">一致はサンプル上の項目コード・日付・金額が一致したことのみを示します。要確認行の判断や請求内容の修正は、必ず担当者が原資料を確認して行ってください。CSVは明示的なダウンロード操作時にのみ作成されます。</p>
     </section>
   </main>
   <div class="toast" id="toast" role="status"></div>
@@ -907,28 +986,242 @@
       notify(matchCount ? `${matchCount}件の希望一致枠が見つかりました。` : "希望条件に合う空き枠はありません。");
     });
 
-    const intakeTab = document.querySelector("#intake-tab");
-    const waitlistTab = document.querySelector("#waitlist-tab");
-    const intakeView = document.querySelector("#intake-view");
-    const waitlistView = document.querySelector("#waitlist-view");
+    const auditSamples = {
+      mixed: [
+        { id: "A-01", chartDate: "10/14", claimDate: "10/14", patient: "デモ患者 A", chartCode: "1101", chartLabel: "初診料", chartAmount: 288, claimCode: "1101", claimLabel: "初診料", claimAmount: 288 },
+        { id: "A-02", chartDate: "10/14", claimDate: "10/14", patient: "デモ患者 A", chartCode: "2203", chartLabel: "口腔内検査", chartAmount: 120, claimCode: "2203", claimLabel: "口腔内検査", claimAmount: 160 },
+        { id: "A-03", chartDate: "10/14", claimDate: "10/15", patient: "デモ患者 A", chartCode: "3102", chartLabel: "歯周基本処置", chartAmount: 340, claimCode: "3104", claimLabel: "歯周検査", claimAmount: 410 },
+        { id: "A-04", chartDate: null, claimDate: "10/14", patient: "デモ患者 B", chartCode: null, chartLabel: null, chartAmount: null, claimCode: "1201", claimLabel: "再診料", claimAmount: 128 }
+      ],
+      matched: [
+        { id: "B-01", chartDate: "10/14", claimDate: "10/14", patient: "デモ患者 C", chartCode: "1101", chartLabel: "初診料", chartAmount: 288, claimCode: "1101", claimLabel: "初診料", claimAmount: 288 },
+        { id: "B-02", chartDate: "10/14", claimDate: "10/14", patient: "デモ患者 C", chartCode: "2203", chartLabel: "口腔内検査", chartAmount: 120, claimCode: "2203", claimLabel: "口腔内検査", claimAmount: 120 }
+      ],
+      missing: [
+        { id: "C-01", chartDate: "10/13", claimDate: "10/13", patient: "デモ患者 D", chartCode: "4102", chartLabel: "歯冠修復", chartAmount: 980, claimCode: "4102", claimLabel: "歯冠修復", claimAmount: 980 },
+        { id: "C-02", chartDate: null, claimDate: "10/13", patient: "デモ患者 D", chartCode: null, chartLabel: null, chartAmount: null, claimCode: "2203", claimLabel: "口腔内検査", claimAmount: 120 }
+      ]
+    };
+    const auditSampleSelect = document.querySelector("#audit-sample");
+    const auditEmpty = document.querySelector("#audit-empty");
+    const auditResults = document.querySelector("#audit-results");
+    const auditList = document.querySelector("#audit-list");
+    const auditSummary = document.querySelector("#audit-summary");
+    const auditActionHint = document.querySelector("#audit-action-hint");
+    const completeAuditButton = document.querySelector("#complete-audit-button");
+    let auditRows = [];
+    let auditComplete = false;
 
-    intakeTab.addEventListener("click", () => {
-      intakeView.hidden = false;
-      waitlistView.hidden = true;
-      intakeTab.classList.add("active");
-      waitlistTab.classList.remove("active");
-      intakeTab.setAttribute("aria-selected", "true");
-      waitlistTab.setAttribute("aria-selected", "false");
+    function compareAuditRow(row) {
+      if (!row.chartCode) return { type: "issue", reason: "カルテに対応する記録がありません" };
+      const differences = [];
+      if (row.chartDate !== row.claimDate) differences.push("診療日が異なります");
+      if (row.chartCode !== row.claimCode) differences.push("項目コードが異なります");
+      if (row.chartLabel !== row.claimLabel) differences.push("項目名が異なります");
+      if (row.chartAmount !== row.claimAmount) differences.push(`金額に差異（${row.chartAmount}円／${row.claimAmount}円）`);
+      return differences.length
+        ? { type: "issue", reason: differences.join("・") }
+        : { type: "matched", reason: "日付・項目・金額が一致" };
+    }
+
+    function getAuditDisposition(row) {
+      const comparison = compareAuditRow(row);
+      return comparison.type === "matched" ? "一致" : row.disposition || "未確認";
+    }
+
+    function updateAuditSummary() {
+      const issues = auditRows.filter((row) => compareAuditRow(row).type === "issue");
+      const pending = issues.filter((row) => !row.disposition || row.disposition === "未確認").length;
+      const held = issues.filter((row) => row.disposition === "保留").length;
+      const reviewed = issues.length - pending - held;
+      const matched = auditRows.length - issues.length;
+      document.querySelector("#audit-total").textContent = String(auditRows.length);
+      document.querySelector("#audit-matched").textContent = String(matched);
+      document.querySelector("#audit-issues").textContent = String(issues.length);
+      document.querySelector("#audit-pending").textContent = String(pending);
+      completeAuditButton.disabled = !auditRows.length || pending > 0 || held > 0 || auditComplete;
+      auditSummary.classList.toggle("ready", auditComplete || (issues.length > 0 && pending === 0 && held === 0));
+      if (auditComplete) {
+        auditSummary.textContent = `担当者確認を完了しました。一致 ${matched}件・確認済みの差異 ${reviewed}件。差異の修正や請求確定は行っていません。`;
+        auditActionHint.textContent = "確認結果をCSVでダウンロードできます。";
+        completeAuditButton.textContent = "確認完了";
+      } else if (pending || held) {
+        auditSummary.textContent = `${issues.length}件の差異があります。未確認 ${pending}件・保留 ${held}件。保留中の行は解消するまで確認完了にできません。`;
+        auditActionHint.textContent = "差異を確認済みにするか、解決できない行の保留を解除してください。";
+        completeAuditButton.textContent = "確認を完了";
+      } else if (issues.length) {
+        auditSummary.textContent = `${issues.length}件すべて確認済みです。内容を再確認して、確認完了にできます。`;
+        auditActionHint.textContent = "各差異の修正は含まれません。確認記録を確定できます。";
+        completeAuditButton.textContent = "確認を完了";
+      } else {
+        auditSummary.textContent = "全項目が一致しました。一致結果の確認を完了できます。";
+        auditActionHint.textContent = "担当者の確認完了を記録してください。";
+        completeAuditButton.textContent = "確認を完了";
+      }
+    }
+
+    function renderAuditRows() {
+      auditList.replaceChildren();
+      auditRows.forEach((row) => {
+        const comparison = compareAuditRow(row);
+        const disposition = getAuditDisposition(row);
+        const card = document.createElement("article");
+        card.className = `audit-row${comparison.type === "issue" ? " issue" : ""}${disposition === "確認済" ? " reviewed" : ""}`;
+        const values = [
+          { label: "患者", value: row.patient, strong: true },
+          { label: "診療記録", value: row.chartCode ? `${row.chartDate} · ${row.chartCode} ${row.chartLabel} · ${row.chartAmount}円` : "該当記録なし", muted: !row.chartCode },
+          { label: "請求内容", value: `${row.claimDate} · ${row.claimCode} ${row.claimLabel} · ${row.claimAmount}円` },
+          { label: "比較結果", value: comparison.reason, muted: comparison.type === "matched" },
+          { label: "照合結果", value: comparison.type === "matched" ? "一致" : "要確認", status: comparison.type }
+        ];
+        values.forEach((cellData) => {
+          const cell = document.createElement("div");
+          cell.className = `audit-cell${cellData.strong ? " strong" : ""}${cellData.muted ? " muted" : ""}`;
+          const label = document.createElement("span");
+          label.className = "audit-cell-label";
+          label.textContent = cellData.label;
+          const value = document.createElement("span");
+          if (cellData.status) {
+            value.className = `audit-status ${cellData.status}`;
+          }
+          value.textContent = cellData.value;
+          cell.append(label, value);
+          card.append(cell);
+        });
+
+        const control = document.createElement("label");
+        control.className = "audit-cell audit-review-control";
+        const controlLabel = document.createElement("span");
+        controlLabel.className = "audit-cell-label";
+        controlLabel.textContent = "確認状況";
+        const select = document.createElement("select");
+        select.dataset.auditId = row.id;
+        if (comparison.type === "matched") {
+          select.disabled = true;
+          select.setAttribute("aria-label", `${row.id}は一致しています`);
+          const option = document.createElement("option");
+          option.textContent = "確認不要";
+          select.append(option);
+        } else {
+          select.setAttribute("aria-label", `${row.id}の担当者確認状況`);
+          ["未確認", "確認済", "保留"].forEach((status) => {
+            const option = document.createElement("option");
+            option.value = status;
+            option.textContent = status;
+            option.selected = disposition === status;
+            select.append(option);
+          });
+        }
+        control.append(controlLabel, select);
+        card.append(control);
+        auditList.append(card);
+      });
+      updateAuditSummary();
+    }
+
+    document.querySelector("#run-audit-button").addEventListener("click", () => {
+      const sample = auditSamples[auditSampleSelect.value];
+      if (!sample) {
+        notify("有効な照合サンプルを選択してください。");
+        return;
+      }
+      auditRows = sample.map((row) => ({ ...row, disposition: compareAuditRow(row).type === "matched" ? "一致" : "未確認" }));
+      auditComplete = false;
+      auditEmpty.hidden = true;
+      auditResults.hidden = false;
+      renderAuditRows();
+      notify(`${auditRows.length}行の診療記録と請求を照合しました。`);
     });
 
-    waitlistTab.addEventListener("click", () => {
-      intakeView.hidden = true;
-      waitlistView.hidden = false;
-      intakeTab.classList.remove("active");
-      waitlistTab.classList.add("active");
-      intakeTab.setAttribute("aria-selected", "false");
-      waitlistTab.setAttribute("aria-selected", "true");
-      waitlistView.scrollIntoView({ behavior: "smooth", block: "start" });
+    auditSampleSelect.addEventListener("change", () => {
+      auditRows = [];
+      auditComplete = false;
+      auditResults.hidden = true;
+      auditEmpty.hidden = false;
+      auditEmpty.querySelector("strong").textContent = "照合結果はまだありません";
+    });
+
+    auditList.addEventListener("change", (event) => {
+      const select = event.target.closest("select[data-audit-id]");
+      if (!select) return;
+      const row = auditRows.find((entry) => entry.id === select.dataset.auditId);
+      if (!row) return;
+      row.disposition = select.value;
+      auditComplete = false;
+      renderAuditRows();
+    });
+
+    document.querySelector("#reset-audit-button").addEventListener("click", () => {
+      auditRows = [];
+      auditComplete = false;
+      auditResults.hidden = true;
+      auditEmpty.hidden = false;
+      auditEmpty.querySelector("strong").textContent = "照合結果はまだありません";
+      notify("照合結果をリセットしました。");
+    });
+
+    completeAuditButton.addEventListener("click", () => {
+      const hasUnresolved = auditRows.some((row) =>
+        compareAuditRow(row).type === "issue" && getAuditDisposition(row) !== "確認済"
+      );
+      if (!auditRows.length || hasUnresolved) {
+        notify("未確認または保留中の差異があるため、完了できません。");
+        return;
+      }
+      auditComplete = true;
+      updateAuditSummary();
+      notify("担当者の照合確認を完了しました。請求内容は変更されていません。");
+    });
+
+    function csvValue(value) {
+      const safeValue = String(value ?? "").replace(/^[=+\-@]/, "'$&");
+      return `"${safeValue.replace(/"/g, '""')}"`;
+    }
+
+    document.querySelector("#download-audit-button").addEventListener("click", () => {
+      if (!auditRows.length) {
+        notify("先に診療記録と請求を照合してください。");
+        return;
+      }
+      const rows = [
+        ["行ID", "患者（サンプル）", "カルテ診療日", "カルテコード", "カルテ項目", "カルテ金額", "請求診療日", "請求コード", "請求項目", "請求金額", "照合結果", "比較内容", "担当者確認"],
+        ...auditRows.map((row) => {
+          const comparison = compareAuditRow(row);
+          return [
+            row.id, row.patient, row.chartDate || "", row.chartCode || "", row.chartLabel || "",
+            row.chartAmount ?? "", row.claimDate, row.claimCode, row.claimLabel, row.claimAmount,
+            comparison.type === "matched" ? "一致" : "要確認", comparison.reason, getAuditDisposition(row)
+          ];
+        })
+      ];
+      const csv = `\uFEFF${rows.map((row) => row.map(csvValue).join(",")).join("\r\n")}`;
+      const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "dental-flow-audit-demo.csv";
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      notify("照合結果のCSVをダウンロードしました。");
+    });
+
+    const moduleTabs = [
+      { tab: document.querySelector("#intake-tab"), view: document.querySelector("#intake-view") },
+      { tab: document.querySelector("#waitlist-tab"), view: document.querySelector("#waitlist-view") },
+      { tab: document.querySelector("#audit-tab"), view: document.querySelector("#audit-view") }
+    ];
+
+    moduleTabs.forEach(({ tab }) => {
+      tab.addEventListener("click", () => {
+        moduleTabs.forEach((module) => {
+          const selected = module.tab === tab;
+          module.view.hidden = !selected;
+          module.tab.classList.toggle("active", selected);
+          module.tab.setAttribute("aria-selected", String(selected));
+        });
+        if (tab !== moduleTabs[0].tab) {
+          moduleTabs.find((module) => module.tab === tab).view.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
     });
 
     renderWaitlist();
